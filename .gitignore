@@ -1,0 +1,5 @@
+/node_modules
+/dist
+.idea
+/documentation/_site
+/documentation/.jekyll-cache

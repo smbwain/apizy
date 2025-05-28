@@ -1,0 +1,32 @@
+{
+  "name": "apizy",
+  "version": "0.2.2",
+  "description": "A robust library designed for seamless communication between a Node.js backend and a JavaScript frontend.",
+  "author": {
+    "name": "Roman Ditchuk",
+    "email": "roman@ototak.net",
+    "url": "http://ototak.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smbwain/apizy.git"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc",
+    "serve-docs": "docker run --rm -v \"./documentation:/srv/jekyll\" -p 4000:4000 -it jekyll/jekyll jekyll serve"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.5.9",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "checkeasy": "^1.1.0"
+  }
+}

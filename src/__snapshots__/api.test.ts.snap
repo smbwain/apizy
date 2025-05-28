@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`api should handle extend queries for entities 1`] = `
+{
+  "items": [],
+}
+`;

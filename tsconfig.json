@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": ["es6"],
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "outDir": "dist",
+    "declaration": true,
+    "strictNullChecks": true,
+    "target": "ES6",
+    "strict": true
+  },
+  "include": [
+    "src"
+  ]
+}

@@ -1,0 +1,87 @@
+// import {Api} from '../index';
+//
+// export const docMdTemplate = (api: Api<any>) => {
+//     const entitiesRegexp = new RegExp(`\\b(?:${Object.keys(api.internals.entities).sort((a,b) => b.length - a.length).join('|')})\\b`, 'g');
+//     const processCode = (s: string) => s.replace(/</g, '&lt;').replace(entitiesRegexp, (s) => `<a href="${transformEntityName(s)}">${s}</a>`);
+//     return `
+// ## Contents
+//
+// Methods
+//
+// ${mapRecursive(
+//     Object.keys(api.internals.methods),
+//     (methodName, lastPart) => {
+//         return `* [${lastPart}](#${transformMethodName(methodName)})\n`;
+// })}
+//
+// Entities
+//
+// ${Object.keys(api.internals.entities).sort().map(entityName => {
+//     return `* [${entityName}](#${transformEntityName(entityName)})`;
+// }).join('\n')}
+//
+// ## Methods
+//
+// ${Object.keys(api.internals.methods).sort().map(methodName => {
+//     const method = api.internals.methods[methodName];
+//     return `### <a name="${transformMethodName(methodName)}"></a>${methodName}
+//
+// \`\`\`ts
+// sdk.${methodName}(input: Input): Promise<Output>
+// \`\`\`
+//
+// <pre><code>type Input = ${processCode(method.inputType?.tsExtract ?? 'null')};</code></pre>
+//
+// <pre><code>type Output = ${processCode(method.outputType.tsResolve)};</code></pre>
+// `;
+// }).join('\n')}
+//
+// ## Entities
+//
+// ${Object.keys(api.internals.entities).sort().map(entityName => {
+//     const entity = api.internals.entities[entityName];
+//     return `### <a name="${transformEntityName(entityName)}"></a>${entityName}
+//
+// <pre><code>
+// type ${entityName} = ${processCode(entity.tsResolveInternal)};
+// </code></pre>
+// `;
+// }).join('\n')}
+//     `;
+// }
+//
+// docMdTemplate.contentType = 'text/html';
+//
+// const transformMethodName = (name: string) => `Method_${name.replace(/\./g, '__')}`;
+// const transformEntityName = (name: string) => `Entity_${name}`;
+//
+// const mapRecursive = (keys: string[], render: (key: string, lastPart: string) => string): string => {
+//     let lastPath: string[] = [];
+//     const parts: string[] = [];
+//     const close = (c: number) => {
+//         // for (; c > 0; c--) {
+//         //     parts.push('</ul></li>\n');
+//         // }
+//     };
+//     keys.sort().forEach(key => {
+//         const path = key.split('.');
+//         const methodName = path.pop();
+//
+//         let commonCount = 0;
+//         while (commonCount < lastPath.length && commonCount < path.length && lastPath[commonCount] === path[commonCount]) {
+//             commonCount++;
+//         }
+//
+//         close(lastPath.length-commonCount);
+//         lastPath = path;
+//
+//         for (let i = commonCount; i < path.length; i++) {
+//             parts.push('  '.repeat(i), `* ${path[i]}\n`);
+//             // parts.push(`<li>${path[i]}<ul>\n`);
+//         }
+//
+//         parts.push('  '.repeat(path.length), render(key, methodName!));
+//     });
+//     close(lastPath.length);
+//     return parts.join('');
+// };

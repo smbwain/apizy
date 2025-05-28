@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`template ts should build 1`] = `
+"
+
+
+export type Method<Input, Output, ExtendQuery, FetchOptions> = (
+    input: Input,
+    options: {
+        extend: ExtendQuery;
+        fetchOptions: FetchOptions;
+    },
+) => Promise<Output>;
+
+export type T_User = {
+    "$type": "User";
+    "id": string;
+    "email": string;
+    "nick": string;
+}
+export interface ExtendQuery_User {}
+
+export type T_Project = {
+    "$type": "Project";
+    "id": string;
+    "name": string;
+}
+export interface ExtendQuery_Project {}
+
+export type T_Member = {
+    "$type": "Member";
+    "id": string;
+    "email": string;
+    "name": string;
+    "role": "owner" | "teacher";
+    "project"?: T_Project;
+    "user"?: T_User;
+}
+export interface ExtendQuery_Member {
+    "project"?: ExtendQuery_Project;
+    "user"?: ExtendQuery_User;
+}
+
+export interface SDK<FetchOptions> {
+    "members": {
+        "list": Method<{
+            "projectId"?: string;
+            "userId"?: string;
+            "my"?: boolean;
+        }, Array<T_Member>, ExtendQuery_Member, FetchOptions>;
+        "manage": {
+            "add": Method<{
+                "projectId": string;
+                "userId": string;
+                "name": string;
+            }, T_Member, ExtendQuery_Member, FetchOptions>;
+            "update": Method<{
+                "id": string;
+                "name"?: string;
+            }, T_Member, ExtendQuery_Member, FetchOptions>;
+        };
+    };
+    "projects": {
+        "get": Method<string, T_Project, ExtendQuery_Project, FetchOptions>;
+    };
+    "users": {
+        "getMe": Method<null, T_User, ExtendQuery_User, FetchOptions>;
+    };
+}
+
+export function createSDK<FetchOptions>(
+    fetch: (methodName: string, input: any, extend?: any, fetchOptions?: FetchOptions) => Promise<any>,
+): SDK<FetchOptions> {
+    const createMethod = (methodName: string) => (input: any, options: any) => fetch(methodName, input, options?.extend, options?.fetchOptions);
+    return {
+        "members": {
+            "list": createMethod("members.list"),
+            "manage": {
+                "add": createMethod("members.manage.add"),
+                "update": createMethod("members.manage.update"),
+            },
+        },
+        "projects": {
+            "get": createMethod("projects.get"),
+        },
+        "users": {
+            "getMe": createMethod("users.getMe"),
+        },
+    };
+};
+"
+`;

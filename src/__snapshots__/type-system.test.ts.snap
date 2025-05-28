@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`type-system should handle extend queries for objects 1`] = `
+{
+  "type": {
+    "objectOf": {
+      "prop1": {
+        "type": {
+          "ts": "string",
+        },
+      },
+      "prop2": {
+        "outputExtendable": true,
+        "type": {
+          "ts": "string",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`type-system should handle extend queries for objects 2`] = `
+{
+  "prop2": undefined,
+}
+`;
+
+exports[`type-system should handle extend queries for objects 3`] = `
+{
+  "prop2": {},
+}
+`;
