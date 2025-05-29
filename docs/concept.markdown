@@ -208,7 +208,7 @@ api.createMethod(
 When you generate a frontend SDK, it will have `sdk.articles.top` method.
 
 ```ts
-await sdk.articles.top(5)
+await sdk.articles.top({limit: 5})
 // Returns:
 // {
 //     id: '...',
@@ -216,7 +216,7 @@ await sdk.articles.top(5)
 //     tags: ['...', ...],
 // }
 
-await sdk.articles.top(5, {extend: {author: {}}})
+await sdk.articles.top({limit: 5}, {extend: {author: {}}})
 // Returns:
 // {
 //     id: '...',
