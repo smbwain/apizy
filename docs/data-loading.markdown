@@ -2,5 +2,5 @@
 layout: page
 title: Data loading
 permalink: /data-loading/
-nav_order: 5
+nav_order: 4
 ---

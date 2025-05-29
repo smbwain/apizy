@@ -2,7 +2,7 @@
 layout: page
 title: Get started
 permalink: /get-started/
-nav_order: 1
+nav_order: 2
 ---
 
 ## Get Started (with express)
@@ -25,6 +25,14 @@ Getting started is easy! Just follow these few steps:
     const api = createApi();
    
     // API methods and types definitions here ...
+    api.createMethod(
+        'helloWorld',               // <-- Name of the method
+        string(),                   // <-- Input data
+        string(),                   // <-- Output data
+        async (input) => {          // <-- Handler
+            return `Hello, ${input}!`;
+        },
+    );
 
     const app = express();
     app.use('/api', apizyExpress(api, {
@@ -54,6 +62,12 @@ Getting started is easy! Just follow these few steps:
     import { createSDK } from './sdk.auto.ts';
     
     const sdk = createSDK('http://localhost:8080/api');
+    ```
+
+5. Call your methods on sdk:
+
+    ```ts
+    sdk.helloWorld('John'); // -> Promise<'Hello, John!'>
     ```
 
 Your SDK is ready to go! Start declaring and calling your first methods—it’s as simple as that!
