@@ -16,7 +16,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "serve-docs": "docker run --rm -v \"./documentation:/srv/jekyll\" -p 4000:4000 -it jekyll/jekyll jekyll serve"
+    "serve-docs": "docker run --rm -v \"./docs:/srv/jekyll\" -v \"$PWD/docs/vendor/bundle:/usr/local/bundle\" -p 4000:4000 -it jekyll/jekyll jekyll serve"
   },
   "license": "ISC",
   "devDependencies": {
