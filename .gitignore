@@ -1,5 +1,5 @@
 /node_modules
 /dist
 .idea
-/documentation/_site
-/documentation/.jekyll-cache
+/docs/_site
+/docs/.jekyll-cache
