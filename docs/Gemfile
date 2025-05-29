@@ -3,7 +3,7 @@ source "https://rubygems.org"
 gem "github-pages", group: :jekyll_plugins
 gem "webrick", "~> 1.9" # Required for Jekyll to work with newer Ruby versions
 
-gem "just-the-docs"
+# gem "just-the-docs"
 
 # Hello! This is where you manage which Jekyll version is used to run.
 # When you want to use a different version, change it below, save the
