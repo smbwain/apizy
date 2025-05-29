@@ -204,7 +204,7 @@ export function createApi<Context extends ApiContext = ApiContext>(): Api<Contex
             try {
                 return [
                     method.inputType?.extract(unsafeInput, 'input'),
-                    method.outputType.checkExtendedQuery!(unsafeExtend, 'extend'),
+                    (method.outputType.checkExtendedQuery ?? check.optional(check.object({})))(unsafeExtend, 'extend'),
                 ];
             } catch (err) {
                 if (err instanceof check.ValidationError) {

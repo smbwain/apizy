@@ -2,7 +2,7 @@ import {extend, object, string} from './type-system';
 import {ValidationError} from 'checkeasy';
 
 describe('type-system', () => {
-    it('should handle extend queries for objects', () => {
+    it('should handle extend queries for objects', async () => {
         const type = object({
             prop1: string(),
             prop2: extend(string()),

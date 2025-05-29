@@ -93,6 +93,20 @@ describe('api', () => {
 
         expect(res).toMatchSnapshot();
 
+        // --
+
+        api.createMethod(
+            'dumbFunction',
+            object({}),
+            boolean(),
+            async (filter, ctx) => {
+                return true;
+            },
+        );
+
+        const res2 = await api.callMethod('dumbFunction', {}, {}, {});
+        expect(res2).toEqual(true);
+
         // expect( type.checkExtendedQuery!({}, 'extend query') ).toMatchSnapshot();
         //
         // expect( type.checkExtendedQuery!({prop2: {}}, 'extend query') ).toMatchSnapshot();
