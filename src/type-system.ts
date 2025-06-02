@@ -1,6 +1,7 @@
 import * as check from 'checkeasy';
 import {mapObject} from './utils';
 import {TypeDescription} from './api-description';
+import {Loadable} from './loadable/loadable';
 
 export type PromiseOrValue<T> = Promise<T> | T;
 
@@ -256,30 +257,31 @@ export const exact = <T>(value: T): Type<T> => ({
     resolve: check.exact(value),
 });
 
-export function relation<T>(
+export function relation<T, Ctx>(
     type: OutputType<T>,
-    load: (id: string, ctx: any) => Promise<T | null>,
+    load: ((id: string, ctx: Ctx) => Promise<T | null>) | Loadable<T, Ctx>,
     options: {
         nullable: true;
         auto?: boolean;
     },
 ): OutputType<string | null>;
-export function relation<T>(
+export function relation<T, Ctx>(
     type: OutputType<T>,
-    load: (id: string, ctx: any) => Promise<T>,
+    load: ((id: string, ctx: any) => Promise<T>) | Loadable<T, Ctx>,
     options?: {
         nullable?: false;
         auto?: boolean;
     },
 ): OutputType<string>;
-export function relation<T>(
+export function relation<T, Ctx>(
     type: OutputType<T>,
-    load: (id: string, ctx: any) => Promise<T | null>,
+    load: ((id: string, ctx: any) => Promise<T | null>) | Loadable<T, Ctx>,
     {nullable, auto = false}: {
         nullable?: boolean;
         auto?: boolean;
     } = {},
 ): OutputType<string> {
+    const handler = (typeof load === 'function') ? load : load.loadOne;
     return {
         desc: {
             ...type.desc,
@@ -297,7 +299,7 @@ export function relation<T>(
                     throw new Error(`Nullable is not allowed but null is passed as id [${path}]`);
                 }
             }
-            const res = await load(id, ctx);
+            const res = await handler(id, ctx);
             if (res === null) {
                 if (nullable) {
                     return null;
