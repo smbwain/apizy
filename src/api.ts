@@ -2,6 +2,7 @@ import {exact, InputType, object, OutputType, PromiseOrValue, string, Type} from
 import * as check from 'checkeasy';
 import {BadReqError, NotFoundError} from './errors';
 import {ApiDescription} from './api-description';
+import {createExtendQueryChecker} from './safety';
 
 const NOT_INITIALIZED_METHOD = () => {
     throw new Error('Not initialized');
@@ -76,7 +77,11 @@ export interface Api<Context extends ApiContext> {
     apiDescription: ApiDescription;
 }
 
-export function createApi<Context extends ApiContext = ApiContext>(): Api<Context> {
+export function createApi<Context extends ApiContext = ApiContext>(options?: {
+    safety?: {
+        extendQuery?: Parameters<typeof createExtendQueryChecker>[0],
+    };
+}): Api<Context> {
     const apiDescription: ApiDescription = {
         methods: {},
         types: {},
@@ -85,6 +90,12 @@ export function createApi<Context extends ApiContext = ApiContext>(): Api<Contex
     const methods: {
         [methodName: string]: Method<Context>;
     } = {};
+
+    const checkExtendQuery = createExtendQueryChecker(options?.safety?.extendQuery ?? {
+        maxDeep: 5,
+        maxNodes: 10,
+        maxWeight: 10,
+    });
 
     function createMethod(name: string, inputType: InputType<any> | null, outputType: OutputType<any>, handler: (input: any, context: Context) => Promise<any>, description?: string) {
         if (methods[name]) {
@@ -200,6 +211,7 @@ export function createApi<Context extends ApiContext = ApiContext>(): Api<Contex
         if (!method) {
             throw new NotFoundError('No method found');
         }
+        checkExtendQuery(unsafeExtend);
         const [input, extend]: any = (() => {
             try {
                 return [
