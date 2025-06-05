@@ -21,12 +21,46 @@ ${Object.keys(desc.types).map(name => {
 export interface SDK<FetchOptions> {
 ${renderMethodsTree(desc.methods, 'type', 1)}}
 
+export interface AuthStorage {
+    get: () => [string | null, string | null];
+    set: (jwt: string | null, rt: string | null) => void;
+}
+
+export const createMemoryAuthStorage = (onJwt?: (jwt: string | null) => void): AuthStorage => {
+    let jwt = null as string | null;
+    let rt = null as string | null;
+    return {
+        get: () => [jwt, rt],
+        set: (_jwt, _rt) => {
+            jwt = _jwt;
+            rt = _rt;
+            onJwt?.(jwt);
+        },
+    };
+}
+
+export const createBrowserAuthStorage = (storage: Storage, onJwt?: (jwt: string | null) => void): AuthStorage => {
+    const set = (key: string, val: string | null) => {
+        if (val === null) {
+            storage.removeItem(key);
+        } else {
+            storage.setItem(key, val);
+        }
+    };
+    onJwt?.(storage.getItem('jwt'));
+    return {
+        get: () => [storage.getItem('jwt'), storage.getItem('rt')],
+        set: (jwt, rt) => {
+            set('jwt', jwt);
+            set('rt', rt);
+            onJwt?.(jwt);
+        },
+    };
+}
+
 export function createSDK(options: {
     url: string;
-    authStorage?: 'memory' | 'localStorage' | 'sessionStorage' | {
-        get: (key: 'jwt' | 'rt') => string | null;
-        set: (key: 'jwt' | 'rt', val: string | null) => void;
-    };
+    authStorage?: AuthStorage;
 }): SDK<{
     signal?: AbortSignal;
     noRefreshToken?: boolean;
@@ -34,45 +68,16 @@ export function createSDK(options: {
 export function createSDK<FetchOptions>(fetch: (methodName: string, input: any, extend?: any, fetchOptions?: FetchOptions) => Promise<any>): SDK<FetchOptions>;
 export function createSDK(p1: {
     url: string;
-    authStorage?: 'memory' | 'localStorage' | 'sessionStorage' | {
-        get: (key: 'jwt' | 'rt') => string | null;
-        set: (key: 'jwt' | 'rt', val: string | null) => void;
-    };
+    authStorage?: AuthStorage;
 } | ((methodName: string, input: any, extend?: any, fetchOptions?: any) => Promise<any>)): SDK<any> {
     const f = typeof p1 === 'function' ? p1 : (() => {
-        let {authStorage: authStorageParam, url} = p1;
-        const authStorage = ((): {
-            get: (key: 'jwt' | 'rt') => string | null;
-            set: (key: 'jwt' | 'rt', val: string | null) => void;
-        } | undefined => {
-            if (authStorageParam === 'memory') {
-                const storage: Record<string, string | null> = {};
-                return {
-                    get: (key) => storage[key] ?? null,
-                    set: (key, val) => storage[key] = val,
-                };
-            }
-            if (authStorageParam === 'localStorage' || authStorageParam === 'sessionStorage') {
-                const storage = window[authStorageParam];
-                return {
-                    get: (key) => storage.getItem(key),
-                    set: (key, val) => {
-                        if (val === null) {
-                            storage.removeItem(key);
-                        } else {
-                            storage.setItem(key, val);
-                        }
-                    },
-                };
-            }
-            return authStorageParam;
-        })();
+        const {authStorage, url} = p1;
         let refreshingToken: Promise<void> | null = null;
         const req = async (methodName: string, input: any, extend?: any, fetchOptions?: {
             signal?: AbortSignal;
             noRefreshToken?: boolean;
         }): Promise<any> => {
-            const jwt = authStorage?.get('jwt');
+            const jwt = authStorage?.get()[0];
             const res = await window.fetch(url + '/' + methodName, {
                 method: 'post',
                 headers: {
@@ -88,7 +93,7 @@ export function createSDK(p1: {
             if (!res.ok) {
                 const err = new Error(await res.text());
                 if (res.status === 401 && !fetchOptions?.noRefreshToken) {
-                    const rt = authStorage?.get('rt');
+                    const rt = authStorage?.get()[1];
                     if (rt) {
                         await (refreshingToken ??= (async () => {
                             await req('$auth.refresh', {rt}, undefined, {
@@ -98,7 +103,7 @@ export function createSDK(p1: {
                             await new Promise(resolve => setTimeout(resolve, 1000));
                             refreshingToken = null;
                         })());
-                        if (!rt || rt === authStorage?.get('rt')) {
+                        if (!rt || rt === authStorage?.get()[1]) {
                             throw new Error('Refresh token was not updated');
                         }
                         return await req(methodName, input, extend, {
@@ -109,7 +114,11 @@ export function createSDK(p1: {
                 }
                 throw err;
             }
-            return (await res.json()).output;
+            const output = (await res.json()).output;
+            if (output?.$auth) {
+                authStorage?.set(output.$auth.jwt ?? null, output.$auth.rt ?? null);
+            }
+            return output;
         };
         return req;
     })();
